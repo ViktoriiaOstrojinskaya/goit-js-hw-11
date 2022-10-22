@@ -1,27 +1,24 @@
-// const URL = 'pixabay.com/api/';
-// const KEY = '30725538-60cf17fec7c19eff2b1d4a894';
+import './css/styles.css';
 
-// const axios = require('axios');
+import axios from 'axios';
+import getImages from './fetchImages';
+import imagesCard from './imagesCard.hbs';
 
-// axios(
-//   'https://pixabay.com/api/?key=30725538-60cf17fec7c19eff2b1d4a894&q=dog&image_type=photo&orientation=horizontal&safesearch=true'
-// ).then(response => console.log(response));
+const refs = {
+  form: document.querySelector('#search-form'),
+  button: document.querySelector('button'),
+  gallery: document.querySelector('.gallery'),
+};
 
-//   .then(function (response) {
-//     // обробка успішного запиту
-//     console.log(response);
-//   })
-//   .catch(function (error) {
-//     // обробка помилки
-//     console.log(error);
+refs.form.addEventListener('input', onSubmit);
 
-function fetchCountries(img) {
-  return fetch(
-    `'https://pixabay.com/api/?key=30725538-60cf17fec7c19eff2b1d4a894&q=dog&image_type=photo&orientation=horizontal&safesearch=true'`
-  ).then(response => {
-    if (!response.ok) {
-      throw new Error();
-    }
-    return response.json();
-  });
+function onSubmit(event) {
+  event.preventDefault();
+  const imgg = form.elements.searchQuery.value;
+
+  getImages(immg).then(showResult);
+}
+
+function showResult(images) {
+  imagesCard(images);
 }
