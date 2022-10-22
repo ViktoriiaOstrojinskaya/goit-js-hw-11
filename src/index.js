@@ -1,24 +1,43 @@
 import './css/styles.css';
 
-import axios from 'axios';
-import getImages from './fetchImages';
 import imagesCard from './imagesCard.hbs';
 
 const refs = {
   form: document.querySelector('#search-form'),
   button: document.querySelector('button'),
   gallery: document.querySelector('.gallery'),
+  loadMore: document.querySelector('.load-more'),
 };
 
-refs.form.addEventListener('input', onSubmit);
+refs.form.addEventListener('submit', onSubmit);
 
 function onSubmit(event) {
   event.preventDefault();
-  const imgg = form.elements.searchQuery.value;
+  const el = refs.form.elements.searchQuery.value;
 
-  getImages(immg).then(showResult);
+  if (!el) {
+    refs.gallery.innerHTML = '';
+    return;
+  }
+
+  fetchImg(el).then(showResult);
 }
 
-function showResult(images) {
-  imagesCard(images);
+function fetchImg(el) {
+  return fetch(
+    `https://pixabay.com/api/?key=30725538-60cf17fec7c19eff2b1d4a894&q=${el}&image_type=photo&orientation=horizontal&safesearch=true`
+  ).then(response => response.json());
+}
+
+function showResult(gallery) {
+  if (gallery.hits.length === 0) {
+    console.log(
+      'Sorry, there are no images matching your search query. Please try again.'
+    );
+    refs.gallery.innerHTML = '';
+    return;
+  }
+
+  const markup = imagesCard(gallery);
+  refs.gallery.innerHTML = markup;
 }
