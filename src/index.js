@@ -1,6 +1,7 @@
 import './css/styles.css';
 
 import imagesCard from './imagesCard.hbs';
+import NewsApiService from './fetchImages';
 
 const refs = {
   form: document.querySelector('#search-form'),
@@ -9,28 +10,30 @@ const refs = {
   loadMore: document.querySelector('.load-more'),
 };
 
-refs.form.addEventListener('submit', onSubmit);
+const newsApiService = new NewsApiService();
 
-function onSubmit(event) {
+refs.form.addEventListener('submit', onSearch);
+refs.loadMore.addEventListener('click', onLoadMore);
+
+function onSearch(event) {
   event.preventDefault();
   const el = refs.form.elements.searchQuery.value;
+  newsApiService.resetPage();
 
-  if (!el) {
+  if (!newsApiService.searchQuery.trim()) {
+    console.log(
+      'Sorry, there are no images matching your search query. Please try again.'
+    );
     refs.gallery.innerHTML = '';
     return;
   }
 
-  fetchImg(el).then(showResult);
-}
-
-function fetchImg(el) {
-  return fetch(
-    `https://pixabay.com/api/?key=30725538-60cf17fec7c19eff2b1d4a894&q=${el}&image_type=photo&orientation=horizontal&safesearch=true`
-  ).then(response => response.json());
+  newsApiService.fetchImg().then(showResult);
+  clearGallery();
 }
 
 function showResult(gallery) {
-  if (gallery.hits.length === 0) {
+  if (!gallery.total) {
     console.log(
       'Sorry, there are no images matching your search query. Please try again.'
     );
@@ -39,5 +42,13 @@ function showResult(gallery) {
   }
 
   const markup = imagesCard(gallery);
-  refs.gallery.innerHTML = markup;
+  refs.gallery.insertAdjacentHTML('beforeend', markup);
+}
+
+function onLoadMore() {
+  newsApiService.fetchImg().then(showResult);
+}
+
+function clearGallery() {
+  refs.gallery.innerHTML = '';
 }
