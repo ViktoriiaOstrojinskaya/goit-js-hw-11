@@ -34,11 +34,11 @@ async function onSearch(event) {
 
   const response = await API.fetchImages(searchQuery, page);
 
-  if (!searchQuery.trim()) {
+  if (searchQuery.trim() === '') {
     Notify.failure(
       'Sorry, there are no images matching your search query. Please try again.'
     );
-    refs.loadMore.hidden = true;
+    // refs.loadMore.hidden = true;
     refs.gallery.innerHTML = '';
     return;
   }
@@ -47,7 +47,6 @@ async function onSearch(event) {
     Notify.success(`Hooray! We found ${response.totalHits} images.`);
   }
 
-  refs.loadMore.hidden = false;
   refs.gallery.innerHTML = '';
   createGallery(response);
   lightbox.refresh();
@@ -79,7 +78,13 @@ function createGallery(response) {
 async function onLoadMore() {
   page += 1;
   const response = await API.fetchImages(searchQuery, page);
-  refs.loadMore.hidden = false;
+
+  if (response.hits.length > 40) {
+    refs.loadMore.hidden = false;
+  }
+
+  // refs.loadMore.hidden = true;
+
   createGallery(response);
   lightbox.refresh();
   currentHits += response.hits.length;
@@ -87,7 +92,7 @@ async function onLoadMore() {
   console.log(`${currentHits} ${response.totalHits}`);
 
   if (currentHits >= response.totalHits) {
-    //refs.loadMore.hidden = true;
-    console.log("We're sorry, but you've reached the end of search results.");
+    refs.loadMore.hidden = true;
+    Notify.info("We're sorry, but you've reached the end of search results.");
   }
 }

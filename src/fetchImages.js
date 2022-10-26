@@ -8,7 +8,7 @@ async function fetchImages(searchQuery, page) {
 
     return await axios
       .get(
-        `${URL}?key=${KEY}&q=${searchQuery}&${OPTIONS}&per_page=10&page=${page}`
+        `${URL}?key=${KEY}&q=${searchQuery}&${OPTIONS}&per_page=40&page=${page}`
       )
       .then(response => response.data);
   } catch (error) {

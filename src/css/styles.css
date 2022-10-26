@@ -62,3 +62,7 @@ button {
 .search-input:hover {
   outline: transparent;
 }
+
+.hidden {
+  display: none;
+}
