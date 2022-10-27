@@ -21,44 +21,52 @@ const refs = {
 
 refs.form.addEventListener('submit', onSearch);
 refs.loadMore.addEventListener('click', onLoadMore);
-refs.loadMore.hidden = true;
 
 let page = 1;
 let searchQuery = '';
-let currentHits = 0;
+//let currentPage = 1;
 
 async function onSearch(event) {
-  event.preventDefault();
-  searchQuery = refs.form.elements.searchQuery.value;
-  page = 1;
+  try {
+    event.preventDefault();
+    searchQuery = refs.form.elements.searchQuery.value;
+    page = 1;
 
-  const response = await API.fetchImages(searchQuery, page);
+    const response = await API.fetchImages(searchQuery, page);
 
-  if (searchQuery.trim() === '') {
-    Notify.failure(
-      'Sorry, there are no images matching your search query. Please try again.'
-    );
-    // refs.loadMore.hidden = true;
-    refs.gallery.innerHTML = '';
-    return;
+    if (searchQuery.trim() === '') {
+      Notify.failure(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
+      refs.gallery.innerHTML = '';
+      return;
+    }
+
+    if (response.totalHits > 0) {
+      Notify.success(`Hooray! We found ${response.totalHits} images.`);
+    }
+
+    if (response.hits.length === 40) {
+      refs.loadMore.removeAttribute('hidden');
+    } else {
+      refs.loadMore.setAttribute('hidden', true);
+    }
+
+    cleanGallery();
+    createGallery(response);
+    lightbox.refresh();
+
+    const { height: cardHeight } = document
+      .querySelector('.gallery')
+      .firstElementChild.getBoundingClientRect();
+
+    window.scrollBy({
+      top: cardHeight * 2,
+      behavior: 'smooth',
+    });
+  } catch (error) {
+    console.error(error);
   }
-
-  if (response.totalHits > 0) {
-    Notify.success(`Hooray! We found ${response.totalHits} images.`);
-  }
-
-  refs.gallery.innerHTML = '';
-  createGallery(response);
-  lightbox.refresh();
-
-  const { height: cardHeight } = document
-    .querySelector('.gallery')
-    .firstElementChild.getBoundingClientRect();
-
-  window.scrollBy({
-    top: cardHeight * 2,
-    behavior: 'smooth',
-  });
 }
 
 function createGallery(response) {
@@ -66,8 +74,7 @@ function createGallery(response) {
     Notify.failure(
       'Sorry, there are no images matching your search query. Please try again.'
     );
-    refs.loadMore.hidden = true;
-    refs.gallery.innerHTML = '';
+    cleanGallery();
     return;
   }
 
@@ -76,23 +83,24 @@ function createGallery(response) {
 }
 
 async function onLoadMore() {
-  page += 1;
-  const response = await API.fetchImages(searchQuery, page);
+  try {
+    page += 1;
+    const response = await API.fetchImages(searchQuery, page);
 
-  if (response.hits.length > 40) {
-    refs.loadMore.hidden = false;
+    createGallery(response);
+    lightbox.refresh();
+
+    const totalPages = Math.ceil(response.totalHits / 40);
+
+    if (page === totalPages) {
+      Notify.info("We're sorry, but you've reached the end of search results");
+      refs.loadMore.setAttribute('hidden', true);
+    }
+  } catch (error) {
+    console.error(error);
   }
+}
 
-  // refs.loadMore.hidden = true;
-
-  createGallery(response);
-  lightbox.refresh();
-  currentHits += response.hits.length;
-
-  console.log(`${currentHits} ${response.totalHits}`);
-
-  if (currentHits >= response.totalHits) {
-    refs.loadMore.hidden = true;
-    Notify.info("We're sorry, but you've reached the end of search results.");
-  }
+function cleanGallery() {
+  refs.gallery.innerHTML = '';
 }
