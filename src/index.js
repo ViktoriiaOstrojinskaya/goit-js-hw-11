@@ -6,6 +6,7 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 
 import imagesCard from './imagesCard.hbs';
 import API from './fetchImages';
+import fetchImages from './fetchImages';
 
 const lightbox = new SimpleLightbox('.photo-card a', {
   captions: true,
@@ -50,6 +51,7 @@ async function onSearch(event) {
     //   refs.loadMore.setAttribute('hidden', true);
     // }
 
+    observer.observe(guard);
     cleanGallery();
     createGallery(response);
     lightbox.refresh();
@@ -110,23 +112,30 @@ function cleanGallery() {
 
 /* ------------- Intersection Observer -------------- */
 
-async function ggg() {
-  const options = {
-    root: null,
-    rootMargin: '50px',
-    threshold: 1,
-  };
-  const observer = new IntersectionObserver(onScroll, options);
-  try {
-    const response = await API.fetchImages(searchQuery, page);
-    createGallery(response);
-    lightbox.refresh();
-    observer.observe(refs.gallery);
+const guard = document.querySelector('.guard');
 
-    function onScroll() {
-      console.log('jj');
+const options = {
+  root: null,
+  rootMargin: '50px',
+  threshold: 1,
+};
+
+const observer = new IntersectionObserver(onScroll, options);
+
+let page = 1;
+
+function onScroll(entries) {
+  const totalPages = Math.ceil(response.totalHits / 40);
+
+  entries.forEach(entry => {
+    console.dir(entry);
+    if (entry.isIntersecting) {
+      page += 1;
+      API.fetchImages(searchQuery, page).createGallery(response);
     }
-  } catch (error) {
-    console.error(error);
-  }
+    if (page === totalPages) {
+      Notify.info("We're sorry, but you've reached the end of search results");
+      observer.unobserve(guard);
+    }
+  });
 }
