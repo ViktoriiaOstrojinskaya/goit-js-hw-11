@@ -31,16 +31,31 @@ p {
   padding: 0;
 }
 
-input,
-button {
+.button-search,
+.search-input,
+.load-more {
   font-family: inherit;
   font-size: 100%;
   line-height: 1.15;
+
   margin: 0;
   border: 1px solid grey;
   color: gray;
+
   border-radius: 4px;
   background-color: transparent;
+}
+
+.button-search:focus,
+.button-search:hover {
+  background-color: rgb(247, 210, 210);
+  box-shadow: 0px 4px 4px rgb(0 0 0 / 15%);
+  cursor: pointer;
+}
+
+.search-input:focus,
+.search-input:hover {
+  outline: transparent;
   box-shadow: 0px 4px 4px rgb(0 0 0 / 15%);
 }
 
@@ -71,18 +86,23 @@ button {
 .load-more {
   background-color: rgb(254 226 226);
 
-  padding: 10px 28px;
   position: relative;
 
   margin-left: 50%;
   transform: translateX(-50%);
 
-  box-shadow: 0px 4px 4px rgb(0 0 0 / 15%);
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
   margin-bottom: 15px;
   margin-top: 15px;
+
+  width: 120px;
+  height: 40px;
+}
+
+.load-more:hover,
+.load-more:focus {
+  background-color: rgb(247, 210, 210);
+  box-shadow: 0px 4px 4px rgb(0 0 0 / 15%);
+  cursor: pointer;
 }
 
 .photo-card {
@@ -113,9 +133,4 @@ img {
   flex-direction: column;
   text-align: center;
   font-size: 12px;
-}
-
-.search-input:focus,
-.search-input:hover {
-  outline: transparent;
 }
