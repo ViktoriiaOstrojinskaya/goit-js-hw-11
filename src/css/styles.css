@@ -77,10 +77,13 @@ p {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
+  justify-content: center;
+
+  padding-left: 30px;
+  padding-right: 30px;
 
   margin-top: 60px;
   margin-bottom: 20px;
-  margin-left: 10px;
 }
 
 .load-more {
